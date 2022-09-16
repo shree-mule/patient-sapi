@@ -1,0 +1,32 @@
+on: 
+   push:
+    branches: [feature/patient-sapi]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+        - uses: actions/checkout@v2
+        - name: Cache local Maven repository
+          uses: actions/cache@v2
+          with:
+            path: ~/.m2/repository
+            key: ${{runner.os}}-maven-${{hashFiles('**/pom.xml')}}
+            restore-keys: |
+                ${{runner.os}}-maven-
+        - name: Create maven settings.xml
+          uses: whelk-io/maven-settings-xml-action@v5
+          with:
+            servers: '[{"id": "MuleRepository", "username": "${{ secrets.MULE_ENT_USERNAME_NEXUS }}", "password": "${{ secrets.MULE_ENT_PASSWORD_NEXUS }}"},{"id": "anypoint-exchange", "username": "${{ secrets.ANYPOINT_PLATFORM_USER }}", "password": "${{ secrets.ANYPOINT_PLATFORM_PASSWORD }}" }]'
+            repositories: '[{"id": "MuleRepository", "url": "https://repository.mulesoft.org/nexus-ee/content/repositories/releases-ee/"},{"id": "local-repo", "url": "file:///${project.basedir}/local-repo"},{"id": "anypoint-exchange", "url": "https://maven.anypoint.mulesoft.com/api/v2/maven"},{"id": "mulesoft-releases", "url": "https://repository.mulesoft.org/releases/"},{"id": "mule-public", "url": "https://repository.mulesoft.org/nexus/content/repositories/public"}]' 
+        - run: |
+            cat ~/.m2/settings.xml
+        - name: Set up JDK 1.8 version
+          uses: actions/setup-java@v1
+          with:
+            java-version: 1.8
+            path: ~/.m2/repository
+            settings-path: ${{ github.workspace }} # location for the settings.xml file
+
+        - name: Build and cloudhub deploymentsss
+          run: mvn clean package deploy -DmuleDeploy -Dmule.env=DEV -DmuleVersion=4.3.0 -Dworkers=1 -Dusername=${{secrets.ANYPOINT_PLATFORM_USER }} -Dpassword=${{ secrets.ANYPOINT_PLATFORM_PASSWORD }} -DapplicationName=patient-sapi -Denvironment=Sandbox -DbusinessGroup=d2d97777-b4e2-416d-86db-77cd5a0da3e4 -Danypoint.platform.client_id=${{secrets.ANYPOINT_PLATFORM_CLIENT_ID}} -Danypoint.platform.client_secret=${{secrets.ANYPOINT_PLATFORM_CLIENT_SECRET}} -DencryptionKey=${{secrets.ENCRYPTION_KEY}} -Dapi.autodiscoveryID=18148380 -DskipTests

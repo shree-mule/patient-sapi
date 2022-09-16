@@ -24,7 +24,7 @@ http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/m
     <db:config name="Database_Patient" doc:name="Database Config" doc:id="e4356ef5-c2b4-4b1d-abd2-57631c981954" >
 		<db:my-sql-connection host="${database.host}" port="${database.port}" user="${database.username}" password="${secure::database.password}" database="b06q3jluukpuqwtulqjj" />
 	</db:config>
-	<global-property doc:name="Global Property" doc:id="02d58336-0202-4962-a17d-19dc1b6c64a6" name="mule.env" value="DEV" />
+	<global-property doc:name="Global Property" doc:id="02d58336-0202-4962-a17d-19dc1b6c64a6" name="mule.env" value="LOCAL" />
 	<global-property doc:name="Global Property" doc:id="e9ff43ac-af35-4f39-97f4-bbb898e9e848" name="encryptionKey" value="sinuvasu12345678" />
 	<configuration-properties doc:name="Configuration properties" doc:id="4ce451f2-9031-4aa5-9f86-ad347f9069f9" file="properties/${mule.env}.yaml" />
 	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="79d0cbea-a35e-4a8b-a08d-4d9106a297f6" file="properties/${mule.env}-secure.yaml" key="${encryptionKey}" />

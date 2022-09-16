@@ -1,0 +1,89 @@
+#%RAML 1.0
+title: patient-sapi
+
+mediaType: application/json
+
+uses:
+  mylib : exchange_modules/d2d97777-b4e2-416d-86db-77cd5a0da3e4/common-fragment/1.0.1/common-fragment.raml
+protocols:
+  - HTTP
+  - HTTPS
+
+types:
+  GetPatientDetailsByHospIdRequest: !include /dataTypes/GetPatientDetailsByHospId.raml
+  GetPatientDetailsByPatientIdRequest: !include /dataTypes/GetPatientDetailsByPatientId.raml
+  PostPatientDetailsRequest: !include /dataTypes/PostPatientDetails.raml
+  PostPatientDetailsResponse: !include /dataTypes/PostPatientDetailsResponse.raml
+  UpdatePatientDetailsRequest: !include /dataTypes/UpdatePatientDetailsRequest.raml
+
+/createPatient:
+  is: [mylib.common-error, mylib.client-id-secret-required]
+  post:
+    body:
+      application/json:
+        type: PostPatientDetailsRequest
+    responses:
+      201:
+        body:
+          application/json:
+            type: PostPatientDetailsResponse
+            
+      
+
+/retrievePatients:
+  get:
+    is: [mylib.common-error, mylib.client-id-secret-required]
+    queryParameters:
+      hospitalId:
+        type: string
+        required: true
+    responses:
+        200:
+          body:
+            application/json:
+              type: GetPatientDetailsByHospIdRequest
+                
+    
+        
+
+/retrievePatient/{patientId}:
+  get:
+    is: [mylib.common-error, mylib.client-id-secret-required]
+    responses:
+      200:
+        body:
+          application/json:
+            type: GetPatientDetailsByPatientIdRequest
+
+/updatePatient:
+  is: [mylib.common-error, mylib.client-id-secret-required]
+  patch:
+    body:
+      application/json:
+        type: UpdatePatientDetailsRequest
+    responses:
+      201:
+        body:
+          application/json:
+            example: !include examples/UpdatePatientDetailsResponse.raml
+              
+/deletePatient:
+  is:  [mylib.common-error, mylib.client-id-secret-required]
+  delete:
+    body:
+      application/json:
+        example:
+          {
+            "patientId": "P001",
+            "hospitalId": "H001"
+          }
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              {
+                "message" : "patient/patients deleted"
+              }
+
+      

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="deletePatientFlow" doc:id="3a89d76b-c03b-4577-8ef8-163765b393c8" >
+		<logger level="INFO" doc:name="Process Started" doc:id="4fe7f968-a06d-4c51-8f41-41d34bd446c8" message="##########Delete Data##########"/>
+		<db:delete doc:name="Delete" doc:id="de18b443-58c2-4404-989d-f0dd81656337" config-ref="Database_Patient">
+			<db:sql ><![CDATA[DELETE FROM `Patient` WHERE PatientId = :PatientId]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	PatientId: payload.PatientId
+}]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform doc:name="Transform Message" doc:id="9557946e-965d-42df-8df4-b29deb2bc18e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "patient deleted",
+	"status": "success"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

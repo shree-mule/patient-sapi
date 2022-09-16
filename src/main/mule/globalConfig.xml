@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:amqp="http://www.mulesoft.org/schema/mule/amqp"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/amqp http://www.mulesoft.org/schema/mule/amqp/current/mule-amqp.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+    
+    <http:listener-config name="patient-sapi-httpListenerConfig">
+        <http:listener-connection host="${http.host}" port="${http.port}" connectionIdleTimeout="${http.idletimeout}"/>
+    </http:listener-config>
+    
+        <apikit:config name="patient-sapi-config" api="patient-sapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <db:config name="Database_Patient" doc:name="Database Config" doc:id="e4356ef5-c2b4-4b1d-abd2-57631c981954" >
+		<db:my-sql-connection host="${database.host}" port="${database.port}" user="${database.username}" password="${secure::database.password}" database="b06q3jluukpuqwtulqjj" />
+	</db:config>
+	<global-property doc:name="Global Property" doc:id="02d58336-0202-4962-a17d-19dc1b6c64a6" name="mule.env" value="DEV" />
+	<global-property doc:name="Global Property" doc:id="e9ff43ac-af35-4f39-97f4-bbb898e9e848" name="encryptionKey" value="sinuvasu12345678" />
+	<configuration-properties doc:name="Configuration properties" doc:id="4ce451f2-9031-4aa5-9f86-ad347f9069f9" file="properties/${mule.env}.yaml" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="79d0cbea-a35e-4a8b-a08d-4d9106a297f6" file="properties/${mule.env}-secure.yaml" key="${encryptionKey}" />
+	<configuration doc:name="Configuration" doc:id="c643358b-0d3e-4c81-a7ca-b34887d9f9f9" defaultErrorHandler-ref="global_error_handler" />
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="4bcefa21-1348-47fa-b7f8-b84855bf524d" >
+		<email:smtps-connection host="${email.host}" user="${email.user}" password="${secure::email.password}" port="${email.port}">
+			<tls:context >
+				<tls:trust-store insecure="true" />
+			</tls:context>
+		</email:smtps-connection>
+	</email:smtp-config>
+	<api-gateway:autodiscovery apiId="18146705" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="f17cbae6-387c-4283-86c0-5e3242be3ad2" flowRef="patient-sapi-main" />
+	
+</mule>

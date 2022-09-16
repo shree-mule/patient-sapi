@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="createPatientDetailsFlow" doc:id="195dcb62-b693-4421-9e4c-0c3cfec227ce" >
+		<logger level="INFO" doc:name="Process Started" doc:id="e9de5f9e-c4ca-418a-aa22-29059d4f6cd4" message="####### Create Patient Details########## "/>
+		<db:insert doc:name="Database" doc:id="1191a072-89a7-414d-9a04-d8e996e6afda" config-ref="Database_Patient">
+			<db:sql ><![CDATA[INSERT INTO `Patient`(`patientId`, `patientName`, `address`, `age`, `gender`, `phoneNumber`, `email`, `bloodType`, `height`, `weight`, `disease`, `comments`, `admissionStatus`, `hospId`) VALUES (:patientId,:patientName,:address,:age,:gender,:phoneNumber,:email,:bloodType,:height,:weight,:disease,:comments,:admissionStatus,:hospId);]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	patientId: payload.patientId,
+	patientName: payload.patientName,
+	address: payload.hospitalId,
+	age: payload.age,
+	gender: payload.gender,
+	phoneNumber: payload.phoneNumber,
+	email: payload.email,
+	bloodType: payload.bloodType,
+	height: payload.height,
+	weight: payload.weight,
+	disease: payload.disease,
+	comments: payload.comments,
+	admissionStatus: payload.admissionStatus,
+	hospId: payload.hospId
+	
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Json Payload" doc:id="3f086374-22bb-4aff-bc67-2843c1f3ea55" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "patient created"
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler ref="global_error_handler" />
+	</flow>
+</mule>

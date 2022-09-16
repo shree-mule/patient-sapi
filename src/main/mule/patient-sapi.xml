@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd ">
+    <flow name="patient-sapi-main">
+        <http:listener config-ref="patient-sapi-httpListenerConfig" path="${http.path}">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="patient-sapi-config" />
+        <error-handler ref="global_error_handler" />
+    </flow>
+    <flow name="patch:\updatePatient:application\json:patient-sapi-config">
+        <flow-ref doc:name="Update Patient Details" doc:id="a8516560-12c8-4d5c-b3ed-1dc4461aabca" name="updatePatientDetailsFlow" />
+        <error-handler ref="global_error_handler" />
+    </flow>
+    <flow name="get:\retrievePatient\(patientId):patient-sapi-config">
+        <flow-ref doc:name="Get Patient Details By Id" doc:id="876fecc6-2507-497b-be87-c557d1ca19c5" name="getPatientDetailsByIdFlow" />
+        <error-handler ref="global_error_handler" />
+    </flow>
+    <flow name="get:\retrievePatients:patient-sapi-config">
+        <flow-ref doc:name="Patient Details By HospId" doc:id="d8553ce4-0c73-45de-98d6-5931e318fcab" name="patientDetailsByHospIdFlow" />
+        <error-handler ref="global_error_handler" />
+    </flow>
+    <flow name="post:\createPatient:application\json:patient-sapi-config">
+        <flow-ref doc:name="Create Patient Details" doc:id="c2d1a828-52bb-4efa-976b-c9d2c4920e69" name="createPatientDetailsFlow" />
+        <error-handler ref="global_error_handler" />
+    </flow>
+    <flow name="delete:\deletePatient:application\json:patient-sapi-config">
+        <flow-ref doc:name="Flow Reference" doc:id="a8669aad-3ebd-4fc4-b7cf-2d5f53980303" name="deletePatientFlow" />
+        <error-handler ref="global_error_handler" />
+    </flow>
+</mule>

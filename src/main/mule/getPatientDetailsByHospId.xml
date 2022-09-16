@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	<flow name="patientDetailsByHospIdFlow" doc:id="1d43bcf4-c2b1-4164-af17-6e1b2acf0511" >
+		<logger level="INFO" doc:name="Process Started" doc:id="1a6a1f81-2da0-4ccf-a3bc-ccd60441bc13" message="#######Patient Details By HospId###########  "/>
+		<db:select doc:name="Database" doc:id="0e61e4fd-eaa3-4435-95fc-475e2cbb437b" config-ref="Database_Patient">
+			<db:sql ><![CDATA[SELECT * FROM `Patient` WHERE hospId = :hosid
+]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+       "hosid" : attributes.queryParams.hospitalId
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Json Payload" doc:id="f1f78940-259c-4bb8-af85-20eb528af25e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler ref="global_error_handler" />
+	</flow>
+</mule>

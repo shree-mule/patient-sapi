@@ -1,0 +1,19 @@
+http:
+  host: "localhost"
+  port: "8082"
+  path: "/api/*"
+  idletimeout: "30000"
+  
+database:
+  host: "b06q3jluukpuqwtulqjj-mysql.services.clever-cloud.com"
+  port: "3306"
+  username: "u70p1cvnvkxpmark"
+  
+email:
+  host: "smtp.gmail.com"
+  port: "465"
+  user: "srinivasmidde1990@gmail.com"
+  
+Autodiscovery:
+  id: "18132495"
+  

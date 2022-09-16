@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<flow name="updatePatientDetailsFlow" doc:id="6e2a786a-7245-4ba4-988c-fa52164c56f8" >
+		<logger level="INFO" doc:name="Process Started" doc:id="b0d52324-d666-4f96-ac9c-faeabb2345c2" message="#########Update Patient Details###########"/>
+		<db:update doc:name="Database" doc:id="7fd40a58-8d6c-49ec-b66d-c845ecf9bad6" config-ref="Database_Patient">
+			<db:sql ><![CDATA[UPDATE `Patient` SET `patientId`= :patientId,`patientName`=:patientName,`address`=:address,`age`=:age,`gender`=:gender,`phoneNumber`=:phoneNumber,`email`=:email,`bloodType`=:bloodType,`height`=:height,`weight`=:weight,`disease`=:disease,`comments`=:comments,`admissionStatus`=:admissionStatus,`hospId`=:hospId WHERE patientId=:patientId;
+]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	patientId: payload.patientId,
+	patientName: payload.patientName,
+	address: payload.address,
+	age: payload.age,
+	gender: payload.gender,
+	phoneNumber: payload.phoneNumber,
+	email: payload.email,
+	bloodType: payload.bloodType,
+	height: payload.height,
+	weight: payload.weight,
+	disease: payload.disease,
+	comments: payload.comments,
+	admissionStatus: payload.admissionStatus,
+	hospId: payload.hospId
+	
+}]]]></db:input-parameters>
+		</db:update>
+		<ee:transform doc:name="Json Payload" doc:id="c4c6da61-6933-404c-98c8-aafcc49a2fa4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "updated records"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler ref="global_error_handler" />
+	</flow>
+</mule>

@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:amqp="http://www.mulesoft.org/schema/mule/amqp"
+	xmlns:solace="http://www.mulesoft.org/schema/mule/solace" xmlns:sqs="http://www.mulesoft.org/schema/mule/sqs" xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/sqs http://www.mulesoft.org/schema/mule/sqs/current/mule-sqs.xsd
+http://www.mulesoft.org/schema/mule/solace http://www.mulesoft.org/schema/mule/solace/current/mule-solace.xsd
+http://www.mulesoft.org/schema/mule/amqp http://www.mulesoft.org/schema/mule/amqp/current/mule-amqp.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+	<error-handler name="global_error_handler" doc:id="40b5cda4-d621-4c50-9d07-133f07949c9f" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="92ddd9a8-1422-4400-91a5-f89f4f63e6d8" type="DB:BAD_SQL_SYNTAX">
+			<set-variable value="500" doc:name="Set Variable" doc:id="6299e945-8e10-41a2-8c9c-96a0a83dff40" variableName="httpStatus"/>
+			<ee:transform doc:name="Transform Message" doc:id="0ae678ff-14a5-4dc7-9f81-6d6494f123fd" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"code": vars.httpstatus,
+	"type": error.errorType.identifier,
+	"message": error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="48ecab0b-2bd2-4f2d-82dc-231f803fc11e" message='#[payload]'/>
+			<flow-ref doc:name="Flow Reference" doc:id="58a30b69-1c5b-4ef5-81fc-c826dc7e775b" name="commonSub_Flow"/>
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="6e8ae064-5c13-4296-a973-b192cf4ddf6a" type="DB:CONNECTIVITY">
+			<set-variable value="500" doc:name="Set Variable" doc:id="882e4021-4330-4bf0-8ec4-ea0b21b2a225" variableName="httpStatus"/>
+			<ee:transform doc:name="Transform Message" doc:id="cfaa782e-9b8c-4c5e-8751-946a2a1db8cb" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"code": vars.httpstatus,
+	"type": error.errorType.identifier,
+	"message": error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="13f04054-b330-4b3b-8118-78791cb213c4" message='#[payload]'/>
+			<flow-ref doc:name="Flow Reference" doc:id="546def55-8c3e-4b1c-a46b-b3d1d3dc3faf" name="commonSub_Flow"/>
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="4c1c9259-1b89-4736-bcb9-ebc30273998c" type="DB:QUERY_EXECUTION">
+			<set-variable value="500" doc:name="Set Variable" doc:id="29008b04-e1c9-4687-99f6-e780e110e906" variableName="httpStatus"/>
+			<ee:transform doc:name="Transform Message" doc:id="d79c3525-191e-4fb6-8fa7-0ba0844324bd" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"code": vars.httpstatus,
+	"type": error.errorType.identifier,
+	"message": error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="b5c20fec-5a4c-4416-9539-93db1f2d3b86" message='#[payload]'/>
+			<flow-ref doc:name="Flow Reference" doc:id="7ad41897-2cc4-4c97-9bbf-e614dc5431c8" name="commonSub_Flow"/>
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="e55e639f-9098-46ea-b8ed-e3c0f862bc17" type="DB:RETRY_EXHAUSTED">
+			<set-variable value="500" doc:name="Set Variable" doc:id="b1fc75ba-2314-485b-9ef9-4ef105fb5a1d" variableName="httpStatus"/>
+			<ee:transform doc:name="Transform Message" doc:id="1bfa9599-c0e7-4239-8a94-31c9e2f80ae1" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"code": vars.httpstatus,
+	"type": error.errorType.identifier,
+	"message": error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="6e2f60db-f8cc-48d8-bd4e-45fabaaf00a9" message='#[payload]'/>
+			<flow-ref doc:name="Flow Reference" doc:id="880d3e4d-d3e0-460a-98ec-920e7bf73800" name="commonSub_Flow"/>
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="5b125a7a-438e-4580-942c-3aaf0a7c5c0c" type="APIKIT:BAD_REQUEST">
+			<set-variable value="400" doc:name="Set Variable" doc:id="76769e15-aaac-4c4a-8f57-59cb5f598eed" variableName="httpStatus"/>
+			<ee:transform doc:name="Transform Message" doc:id="c9e6fc92-1e17-498a-9b39-c382ab410af8" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"code": vars.httpstatus,
+	"type": error.errorType.identifier,
+	"message": error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="f76cc660-2b1b-40f3-817b-2a3701f46607" message="#[payload]"/>
+			<flow-ref doc:name="Flow Reference" doc:id="457e0c50-6455-40dd-9120-ca39db65c2a7" name="commonSub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="aa8d9155-594d-4002-a662-7b946b4137c6" type="APIKIT:METHOD_NOT_ALLOWED">
+			<set-variable value="405" doc:name="Set Variable" doc:id="dedbaee8-670f-431f-a642-0577c88a7555" variableName="httpStatus"/>
+			<ee:transform doc:name="Transform Message" doc:id="acd73df1-cfa7-4e62-b3a8-0a8bead3fd54" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"code": vars.httpstatus,
+	"type": error.errorType.identifier,
+	"message": error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="81be204f-07fb-4c95-8d20-d584717de1d3" message="#[payload]"/>
+			<flow-ref doc:name="Flow Reference" doc:id="2abaac51-f834-4ec0-8197-572e02b18326" name="commonSub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="37bcf726-00b8-4373-b8d2-bc8811937d7c" type="APIKIT:NOT_FOUND">
+			<set-variable value="404" doc:name="Set Variable" doc:id="767fe403-ab00-4aee-804f-a1c4c9ba2529" variableName="httpStatus"/>
+			<ee:transform doc:name="Transform Message" doc:id="c30c93c6-378a-44a6-96a1-7ea7a9fcb3c0" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"code": vars.httpstatus,
+	"type": error.errorType.identifier,
+	"message": error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="b06904e7-aa8f-48e9-bc2d-e6f70923ea6a" message="#[payload]"/>
+			<flow-ref doc:name="Flow Reference" doc:id="4abcc649-0197-4e03-9c84-c62001409a8d" name="commonSub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="ac06e2ba-8ac9-494f-aee7-324f2e34415b" type="HTTP:BAD_REQUEST">
+			<set-variable value="400" doc:name="Set Variable" doc:id="5e77ef75-eb16-46b2-ba11-3d40614ec254" variableName="httpStatus"/>
+			<ee:transform doc:name="Transform Message" doc:id="d7dfbfd1-08de-49f3-900d-348233bf21d7" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"code": vars.httpstatus,
+	"type": error.errorType.identifier,
+	"message": error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="d5d3b15d-0d35-459e-b2a1-f113fedbd1a8" message="#[payload]"/>
+			<flow-ref doc:name="Flow Reference" doc:id="de731f49-12ec-4683-adb2-dc16bfbb1ef7" name="commonSub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="f1f4c76d-6796-427f-8442-f743c4c4b27f" type="HTTP:CONNECTIVITY">
+			<set-variable value="500" doc:name="Set Variable" doc:id="1fed0315-31b9-4699-9217-9795ebb990c6" variableName="httpStatus"/>
+			<ee:transform doc:name="Transform Message" doc:id="48219c29-0555-47ac-9b63-a49b56fd0948" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"code": vars.httpstatus,
+	"type": error.errorType.identifier,
+	"message": error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="f2b42b61-1fa2-42c9-97f6-c53879cbef57" message="#[payload]"/>
+			<flow-ref doc:name="Flow Reference" doc:id="028fe5bd-1b6a-4193-be11-b287f2d28e57" name="commonSub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="6e5e885f-d2f9-4641-8008-069bd67a3429" type="HTTP:METHOD_NOT_ALLOWED">
+			<set-variable value="405" doc:name="Set Variable" doc:id="247ccaa5-40a6-4b08-b804-f61c64145e38" variableName="httpStatus"/>
+			<ee:transform doc:name="Transform Message" doc:id="71a9f5a7-1f35-45a6-93e1-fc708fc34c98" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"code": vars.httpstatus,
+	"type": error.errorType.identifier,
+	"message": error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="9c49ca0d-ec11-472e-8db8-7de2196b2db1" message="#[payload]"/>
+			<flow-ref doc:name="Flow Reference" doc:id="b6c86cdc-a4b5-4443-b0bd-cb788bae5798" name="commonSub_Flow"/>
+		</on-error-propagate>
+	
+</error-handler>
+	<sub-flow name="commonSub_Flow" doc:id="c1ea33d2-67c9-404e-bad6-42714f29e26b" >
+		<logger level="INFO" doc:name="Logger" doc:id="08720b6f-b661-4e13-9d2a-de8bc09b50bd" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="5fe1bcb5-7c31-4466-9503-f384c8ea79f7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"code": vars.httpstatus,
+	"type": error.errorType.identifier,
+	"message": error.description,
+	"status": "ERROR"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<email:send doc:name="Send" doc:id="c20a7dd9-ba20-40d0-b4ff-0c457d9b9df4" config-ref="Email_SMTP" fromAddress='#["srinivasmidde1990@gmail.com"]' subject="mule application status">
+			<email:to-addresses >
+				<email:to-address value="sinu31@gmail.com" />
+			</email:to-addresses>
+			<email:body >
+				<email:content ><![CDATA[#[payload.message]]]></email:content>
+			</email:body>
+		</email:send>
+	</sub-flow>
+
+</mule>

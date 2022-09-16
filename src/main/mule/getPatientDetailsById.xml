@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:amqp="http://www.mulesoft.org/schema/mule/amqp" xmlns:solace="http://www.mulesoft.org/schema/mule/solace"
+	xmlns:sqs="http://www.mulesoft.org/schema/mule/sqs"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/sqs http://www.mulesoft.org/schema/mule/sqs/current/mule-sqs.xsd
+http://www.mulesoft.org/schema/mule/solace http://www.mulesoft.org/schema/mule/solace/current/mule-solace.xsd
+http://www.mulesoft.org/schema/mule/amqp http://www.mulesoft.org/schema/mule/amqp/current/mule-amqp.xsd">
+	<flow name="getPatientDetailsByIdFlow" doc:id="06d19bdf-f7f1-4bb6-a265-b603019378ab" >
+		<logger level="INFO" doc:name="Process Sarted" doc:id="b641bceb-4cb7-4e8b-89bc-1ca72acc599a" message="#########Patient Details By Id############"/>
+		<db:select doc:name="Database" doc:id="61b9047c-d38b-4c67-a71a-207c4e1603f7" config-ref="Database_Patient">
+			<db:sql ><![CDATA[SELECT * FROM `Patient` WHERE patientId = :patientid
+]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	"patientid": attributes.uriParams.patientId
+	
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Json Payload" doc:id="91369bce-9df4-4166-af79-ef72c2c16cf7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler ref="global_error_handler" />
+	</flow>
+</mule>
